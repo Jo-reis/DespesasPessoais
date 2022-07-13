@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../models/transaction.dart';
+import 'transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -11,64 +11,47 @@ class TransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return transactions.isEmpty
-        ? Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Nenhuma Transação Cadastrada!',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                height: 200,
-                child: Image.asset(
-                  'assets/images/waiting.png',
-                  fit: BoxFit.cover,
+        ? LayoutBuilder(builder: (context, constraints) {
+            return Column(
+              children: [
+                SizedBox(
+                  height: 20,
                 ),
-              )
-            ],
-          )
-        : ListView.builder(
+                Text(
+                  'Nenhuma Transação Cadastrada!',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Container(
+                  height: constraints.maxHeight * 0.6,
+                  child: Image.asset(
+                    'assets/images/waiting.png',
+                    fit: BoxFit.cover,
+                  ),
+                )
+              ],
+            );
+          })
+        : /*ListView(
+            children: transactions.map((tr) {
+              return TransactionItem(
+                key: ValueKey(tr.id),
+                tr: tr,
+                onRemove: onRemove,
+              );
+            }).toList(),
+          );*/
+
+        ListView.builder(
             itemCount: transactions.length,
             itemBuilder: (ctx, index) {
               final tr = transactions[index];
-              return Card(
-                margin: EdgeInsets.symmetric(
-                  vertical: 8,
-                  horizontal: 5,
-                ),
-                elevation: 5,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: Padding(
-                      padding: const EdgeInsets.all(6),
-                      child: FittedBox(
-                        child: Text(
-                          'R\$${tr.value}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                    radius: 30,
-                  ),
-                  title: Text(
-                    tr.title,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  subtitle: Text(
-                    DateFormat('d MM y').format(tr.date),
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => onRemove(tr.id),
-                    color: Theme.of(context).errorColor,
-                  ),
-                ),
+              return TransactionItem(
+                key: GlobalObjectKey(tr),
+                tr: tr,
+                onRemove: onRemove,
               );
             },
           );
